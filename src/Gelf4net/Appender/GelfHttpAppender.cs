@@ -14,7 +14,7 @@ namespace gelf4net.Appender
 
         private Uri _baseUrl;
 
-        private int _timeout;
+        private TimeSpan _timeout;
 
         public string Url { get; set; }
 
@@ -43,12 +43,12 @@ namespace gelf4net.Appender
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             }
 
-            _timeout = Timeout == default(int) ? 5 : Timeout;
+            _timeout = TimeSpan.FromMilliseconds(Timeout == default(int) ? 5000 : Timeout);
         }
 
         protected override void Append(LoggingEvent loggingEvent)
         {
-            var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var tokenSource = new CancellationTokenSource(_timeout);
             Task.Run(async () =>
             {
                 try
